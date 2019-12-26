@@ -12,6 +12,8 @@
 #define NUM_LEDS      10
 #define LED_DATA_PIN  4
 #define NUM_MODES     12
+#define TEST_PIN      3
+//#define ENABLE_TEST   1
 
 // USER VARS
 int mode = 0;
@@ -20,6 +22,7 @@ int mode = 0;
 
 int counter = 0;
 int dir = 1;
+long timer = 0;
 
 // Start Sensor
 CapacitiveSensor cs1 = CapacitiveSensor(0, 1); // 10M resistor between pins 0 & 1
@@ -29,6 +32,9 @@ CRGB leds[NUM_LEDS];
 
 void setup() {
   FastLED.addLeds<WS2811, LED_DATA_PIN>(leds, NUM_LEDS);
+#ifdef ENABLE_TEST
+  pinMode(TEST_PIN, OUTPUT);
+#endif
 }
 
 void loop() {
@@ -39,6 +45,22 @@ void loop() {
       lastTouchTime = millis();
       mode++;
     }
+
+#ifdef ENABLE_TEST
+    if ((millis() - timer) < 500)
+    {
+      digitalWrite(TEST_PIN, LOW);
+    }
+    else if ((millis() - timer) < 1000)
+    {
+      digitalWrite(TEST_PIN, HIGH);
+    }
+    else
+    {
+      timer = millis();
+    }
+#endif
+    
     // if mode greater than NUM_MODES reset
     if (mode > NUM_MODES) { mode = 0; }
     // main function
